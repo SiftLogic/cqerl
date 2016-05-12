@@ -313,7 +313,7 @@ start_link() ->
 
 
 init([]) ->
-    random:seed(?SEED),
+    random:seed(now()),
     process_flag(trap_exit, true),
     BaseState = #cqerl_state{clients = ets:new(clients, [set, private, {keypos, #cql_client.pid}]),
         client_stats = [],
