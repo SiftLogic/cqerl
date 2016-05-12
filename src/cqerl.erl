@@ -483,12 +483,13 @@ new_pool(NodeKey={Ip, Port, Keyspace}, LocalOpts, GlobalOpts, State=#cqerl_state
                      {max_count,       OptGetter(pool_max_size)},
                      {cull_interval,   OptGetter(pool_cull_interval)},
                      {max_age,         {Amount/2, Unit}},
-                     {start_mfa,       {cqerl_client, start_link, [{Ip, Port},
-                                           [  {auth, OptGetter(auth)},
-                                              {ssl, OptGetter(ssl)},
+                     {start_mfa,       {cqerl_client, start_link, [
+                                           {Ip, Port},
+                                           [  {ssl, OptGetter(ssl)},
                                               {sleep_duration, {Amount/2, Unit}},
-                                              {keyspace, Keyspace},
-                                              {protocol_version, OptGetter(protocol_version)} ]
+                                              {keyspace, Keyspace}
+                                           ],
+                                           OptGetter
                                         ]}
                      }
                    ]),

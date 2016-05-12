@@ -8,7 +8,7 @@
 %% API Function Exports
 %% ------------------------------------------------------------------
 
--export([start_link/2, start_link/3, new_user/2, remove_user/1,
+-export([start_link/3, start_link/4, new_user/2, remove_user/1,
          run_query/2, query_async/2, fetch_more/1, fetch_more_async/1,
          prepare_query/2,
          batch_ready/2]).
@@ -70,11 +70,11 @@ end).
 %% API Function Definitions
 %% ------------------------------------------------------------------
 
-start_link(Inet, Opts) ->
-    gen_fsm:start_link(?MODULE, [Inet, Opts, undefined], []).
+start_link(Inet, Opts, OptGetter) ->
+    gen_fsm:start_link(?MODULE, [Inet, Opts, OptGetter, undefined], []).
 
-start_link(Inet, Opts, Key) ->
-    gen_fsm:start_link(?MODULE, [Inet, Opts, Key], []).
+start_link(Inet, Opts, OptGetter, Key) ->
+    gen_fsm:start_link(?MODULE, [Inet, Opts, OptGetter, Key], []).
 
 new_user(Pid, From) ->
     case cqerl_app:mode() of
@@ -132,11 +132,11 @@ batch_ready({ClientPid, Call}, QueryBatch) ->
 %% gen_fsm Function Definitions
 %% ------------------------------------------------------------------
 
-init([Inet, Opts, Key]) ->
+init([Inet, Opts, OptGetter, Key]) ->
     case create_socket(Inet, Opts) of
         {ok, Socket, Transport} ->
-            {auth, {AuthHandler, AuthArgs}} = proplists:lookup(auth, Opts),
-            cqerl:put_protocol_version(proplists:get_value(protocol_version, Opts, cqerl:get_protocol_version())),
+            {AuthHandler, AuthArgs} = OptGetter(auth),
+            cqerl:put_protocol_version(OptGetter(protocol_version)),
             {ok, OptionsFrame} = cqerl_protocol:options_frame(#cqerl_frame{}),
             put(uuidstate, uuid:new(self())),
             State = #client_state{
