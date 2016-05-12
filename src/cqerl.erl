@@ -61,8 +61,6 @@
 
 -export_type([client/0, inet/0]).
 
--define(SEED, {erlang:unique_integer([positive]), erlang:unique_integer([positive]), erlang:unique_integer([positive])}).
-
 -record(cql_client_stats, {
     min_count :: integer(),
     max_count :: integer(),
@@ -272,7 +270,7 @@ start_link() ->
 
 
 init([]) ->
-    random:seed(?SEED),
+    random:seed(now()),
     process_flag(trap_exit, true),
     BaseState = #cqerl_state{clients = ets:new(clients, [set, private, {keypos, #cql_client.pid}]),
         client_stats = [],
