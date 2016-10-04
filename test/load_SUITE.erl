@@ -22,7 +22,7 @@
 %% default data values, not perform any other operations.
 %%--------------------------------------------------------------------
 suite() ->
-  [{timetrap, {seconds, 30}} | test_helper:requirements()].
+  [{timetrap, {seconds, 60}} | test_helper:requirements()].
 
 %%--------------------------------------------------------------------
 %% Function: groups() -> [Group]
@@ -102,7 +102,9 @@ init_per_suite(Config) ->
     cqerl:run_query(Client, "CREATE TABLE entries1 (id int PRIMARY KEY, name text);"),
     cqerl:close_client(Client),
 
-    [{pool_min_size, 10}, {pool_max_size, 100} | Config1].
+    PoolSize = max(erlang:system_info(schedulers_online), 2),
+
+    [{pool_min_size, 2}, {pool_max_size, PoolSize} | Config1].
 
 %%--------------------------------------------------------------------
 %% Function: end_per_suite(Config0) -> void() | {save_config,Config1}
