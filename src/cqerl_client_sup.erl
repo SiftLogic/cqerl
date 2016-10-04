@@ -9,8 +9,6 @@
 %% Supervisor callbacks
 -export([init/1]).
 
-%% Helper macro for declaring children of supervisor
-
 -define(DEFAULT_NUM_CLIENTS, 20).
 
 %% ===================================================================
@@ -25,37 +23,19 @@ start_link() ->
 %% ===================================================================
 
 init(main) ->
-    {ok,
-     {
-      #{
-       strategy => simple_one_for_one
-      },
-      [#{
-        id => key_sup,
-        start => {supervisor, start_link, [?MODULE]},
-        restart => transient,
-        type => supervisor
-      }]
-     }};
+    {ok, { {simple_one_for_one, 5, 10}, [ {key_sup, {supervisor, start_link, [?MODULE]},
+                                          transient, 5000, supervisor, [?MODULE]}
+                                        ]}};
 
 init([key, Key = {Node, _Opts}, FullOpts, OptGetter, ChildCount]) ->
-    {ok,
-     {
-      #{
-       strategy => one_for_one,
-       intensity => 5,
-       period => 10
-      },
-      [
+    {ok, { {one_for_one, 5, 10}, [
         client_spec(Key, Node, FullOpts, OptGetter, I) ||
         I <- lists:seq(1, ChildCount)
-      ]}}.
+                                 ] }}.
 
 client_spec(Key, Node, FullOpts, OptGetter, I) ->
-    #{
-       id => {cqerl_client, Key, I},
-       start => {cqerl_client, start_link, [Node, FullOpts, OptGetter, Key]}
-     }.
+    { {cqerl_client, Key, I}, {cqerl_client, start_link, [Node, FullOpts, OptGetter, Key]},
+      permanent, brutal_kill, worker, [cqerl_client]}.
 
 add_clients(Node, Opts) ->
     Key = cqerl_client:make_key(Node, Opts),
