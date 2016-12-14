@@ -66,7 +66,7 @@
     page_size   = 100       :: integer(),
     page_state              :: binary() | undefined,
     
-    consistency = one :: consistency_level() | consistency_level_int(),
+    consistency = quorum :: consistency_level() | consistency_level_int(),
     serial_consistency = undefined :: serial_consistency() | serial_consistency_int() | undefined,
 
     value_encode_handler = undefined :: function() | undefined
@@ -79,7 +79,7 @@
 }).
 
 -record(cql_query_batch, {
-    consistency         = one :: consistency_level() | consistency_level_int(),
+    consistency         = quorum :: consistency_level() | consistency_level_int(),
     mode                = logged :: batch_mode() | batch_mode_int(),
     queries             = [] :: list(tuple())
 }).
