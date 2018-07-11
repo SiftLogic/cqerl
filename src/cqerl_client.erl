@@ -171,7 +171,7 @@ init([Inet, Opts, OptGetter, Key]) ->
             },
             State = send_to_db(State0, OptionsFrame),
             activate_socket(State),
-            HeartbeatInterval = ?HEARTBEAT_MAX_INITIAL_CHECK_INTERVAL_MSECS + random:uniform(?HEARTBEAT_MAX_INITIAL_CHECK_INTERVAL_MSECS),
+            HeartbeatInterval = ?HEARTBEAT_MAX_INITIAL_CHECK_INTERVAL_MSECS + rand:uniform(?HEARTBEAT_MAX_INITIAL_CHECK_INTERVAL_MSECS),
             erlang:send_after(HeartbeatInterval, self(), heartbeat_check),
             {ok, starting, State};
 
