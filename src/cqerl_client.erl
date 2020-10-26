@@ -1,5 +1,5 @@
 -module(cqerl_client).
--behaviour(gen_fsm).
+-behaviour(gen_fsm_compat).
 -define(SERVER, ?MODULE).
 
 -include("cqerl_protocol.hrl").
@@ -76,16 +76,16 @@ end).
 %% ------------------------------------------------------------------
 
 start_link(Inet, Opts, OptGetter) ->
-    gen_fsm:start_link(?MODULE, [Inet, Opts, OptGetter, undefined], []).
+    gen_fsm_compat:start_link(?MODULE, [Inet, Opts, OptGetter, undefined], []).
 
 start_link(Inet, Opts, OptGetter, Key) ->
-    gen_fsm:start_link(?MODULE, [Inet, Opts, OptGetter, Key], []).
+    gen_fsm_compat:start_link(?MODULE, [Inet, Opts, OptGetter, Key], []).
 
 new_user(Pid, From) ->
     case cqerl_app:mode() of
         pooler ->
             try
-                gen_fsm:sync_send_event(Pid, {new_user, From}, infinity)
+                gen_fsm_compat:sync_send_event(Pid, {new_user, From}, infinity)
             catch
                 exit:_ -> {error, {closed, process_died}}
             end;
@@ -95,14 +95,14 @@ new_user(Pid, From) ->
 
 remove_user({ClientPid, ClientRef}) ->
     cqerl_app:mode() =:= pooler andalso
-    gen_fsm:send_event(ClientPid, {remove_user, ClientRef}).
+    gen_fsm_compat:send_event(ClientPid, {remove_user, ClientRef}).
 
 run_query(Client, Query) when ?IS_IOLIST(Query) ->
     run_query(Client, #cql_query{statement=Query});
 run_query(Client, Query=#cql_query{statement=Statement}) when is_list(Statement) ->
     run_query(Client, Query#cql_query{statement=iolist_to_binary(Statement)});
 run_query({ClientPid, ClientRef}, Query) ->
-    gen_fsm:sync_send_event(ClientPid, {send_query, ClientRef, Query}, ?FSM_TIMEOUT).
+    gen_fsm_compat:sync_send_event(ClientPid, {send_query, ClientRef, Query}, ?FSM_TIMEOUT).
 
 query_async(Client, Query) when ?IS_IOLIST(Query) ->
     query_async(Client, #cql_query{statement=Query});
@@ -110,28 +110,28 @@ query_async(Client, Query=#cql_query{statement=Statement}) when is_list(Statemen
     query_async(Client, Query#cql_query{statement=iolist_to_binary(Statement)});
 query_async({ClientPid, ClientRef}, Query) ->
     QueryRef = make_ref(),
-    gen_fsm:send_event(ClientPid, {send_query, {self(), QueryRef}, ClientRef, Query}),
+    gen_fsm_compat:send_event(ClientPid, {send_query, {self(), QueryRef}, ClientRef, Query}),
     QueryRef.
 
 fetch_more(Continuation=#cql_result{client={ClientPid, ClientRef}}) ->
-    gen_fsm:sync_send_event(ClientPid, {fetch_more, ClientRef, Continuation}, ?FSM_TIMEOUT).
+    gen_fsm_compat:sync_send_event(ClientPid, {fetch_more, ClientRef, Continuation}, ?FSM_TIMEOUT).
 
 fetch_more_async(Continuation=#cql_result{client={ClientPid, ClientRef}}) ->
     QueryRef = make_ref(),
-    gen_fsm:send_event(ClientPid, {fetch_more, {self(), QueryRef}, ClientRef, Continuation}),
+    gen_fsm_compat:send_event(ClientPid, {fetch_more, {self(), QueryRef}, ClientRef, Continuation}),
     QueryRef.
 
 prepare_query(ClientPid, Query) ->
     % We don't want the cqerl_cache process to crash if our client has gone away,
     % so wrap in a try-catch
     try
-        gen_fsm:send_event(ClientPid, {prepare_query, Query})
+        gen_fsm_compat:send_event(ClientPid, {prepare_query, Query})
     catch
         _:_ -> ok
     end.
 
 batch_ready({ClientPid, Call}, QueryBatch) ->
-    gen_fsm:send_event(ClientPid, {batch_ready, Call, QueryBatch}).
+    gen_fsm_compat:send_event(ClientPid, {batch_ready, Call, QueryBatch}).
 
 make_key(Node, Opts) ->
     SafeOpts =
@@ -571,7 +571,7 @@ terminate(_Reason, sleep, _State) ->
 terminate(Reason, live, #client_state{queries=Queries}) ->
     lists:foreach(fun
         ({_I, {#cql_call{type=sync, caller=From}, _}}) ->
-            gen_fsm:reply(From, {error, Reason});
+            gen_fsm_compat:reply(From, {error, Reason});
         ({_I, {#cql_call{type=async, caller={Pid, Tag}}, _}}) ->
             Pid ! {cql_error, Tag, Reason};
         ({_I, _}) -> ok
@@ -717,10 +717,10 @@ process_outgoing_query(Call,
 
 
 respond_to_user(#cql_call{type=sync, caller=From}, Reply={error, _Term}) ->
-    gen_fsm:reply(From, Reply);
+    gen_fsm_compat:reply(From, Reply);
 
 respond_to_user(#cql_call{type=sync, caller=From}, Term) ->
-    gen_fsm:reply(From, {ok, Term});
+    gen_fsm_compat:reply(From, {ok, Term});
 
 respond_to_user(#cql_call{type=async, caller={Pid, QueryRef}}, {error, Term}) ->
     Pid ! {error, QueryRef, Term};
