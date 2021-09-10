@@ -1,0 +1,36 @@
+{"1.2.0",
+[{<<"gen_fsm_compat">>,
+  {git,"https://github.com/SiftLogic/gen_fsm_compat.git",
+       {ref,"dc5976180c5a80d676cc50e57775c96bf0ba119a"}},
+  0},
+ {<<"lz4">>,
+  {git,"https://github.com/SiftLogic/erlang-lz4.git",
+       {ref,"acdb60c3b919e00fa5db5f167d44b63c575c0ea6"}},
+  0},
+ {<<"pooler">>,{pkg,<<"pooler">>,<<"1.5.3">>},0},
+ {<<"quickrand">>,
+  {git,"https://github.com/okeuday/quickrand.git",
+       {ref,"6fc9c094e11d7d7430da9039d1dea648f12d42f0"}},
+  1},
+ {<<"re2">>,
+  {git,"https://github.com/tuncer/re2.git",
+       {ref,"2471e06ed7e548ca1af522e95b16867135afdfdc"}},
+  0},
+ {<<"semver">>,
+  {git,"https://github.com/nebularis/semver.git",
+       {ref,"c7d509f38298ec6594be4efdcd8a8f2322760039"}},
+  0},
+ {<<"snappy">>,
+  {git,"https://github.com/fdmanana/snappy-erlang-nif.git",
+       {ref,"e8907ee8e37cfa07d933a070669a88798082c3d7"}},
+  0},
+ {<<"uuid">>,
+  {git,"git@github.com:SiftLogic/uuid.git",
+       {ref,"bd17a367415532ff299a23765e071d7b13397600"}},
+  0}]}.
+[
+{pkg_hash,[
+ {<<"pooler">>, <<"898CD1FA301FC42D4A8ED598CE139B71CA85B54C16AB161152B5CC5FBDCFA1A8">>}]},
+{pkg_hash_ext,[
+ {<<"pooler">>, <<"058D85C5081289B90E97E4DDDBC3BB5A3B4A19A728AB3BC88C689EFCC36A07C7">>}]}
+].
