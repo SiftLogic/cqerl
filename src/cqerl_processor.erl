@@ -14,8 +14,8 @@ process(ClientPid, A, B, ProtocolVersion) ->
     try do_process(ClientPid, A, B) of
         Result -> Result
     catch
-        ErrorClass:Error ->
-            ClientPid ! {processor_threw, {{ErrorClass, {Error, erlang:get_stacktrace()}}, {A, B}}}
+        ErrorClass:Error:Stacktrace ->
+            ClientPid ! {processor_threw, {{ErrorClass, {Error, Stacktrace}}, {A, B}}}
     end.
 
 do_process(ClientPid, Query, { prepared, Msg }) ->
