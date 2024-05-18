@@ -156,7 +156,7 @@ normalise_to_atom(KS) when is_atom(KS) -> KS.
 %% ------------------------------------------------------------------
 
 callback_mode() ->
-    handle_event_function.
+    state_functions.
 
 init([Inet, Opts, OptGetter, Key]) ->
     case create_socket(Inet, Opts) of
